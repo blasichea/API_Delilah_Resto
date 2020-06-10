@@ -1,15 +1,17 @@
 const jwt = require('jsonwebtoken');
-const secreto = '4ndr35170';
+const secret = '4ndr35170';
 
 var token = {};
 
 token.codToken = function(userId) {
-	var key = jwt.sign({user: userId}, secreto);
+	var key = jwt.sign({user: userId}, secret, {
+		expiresIn: 3600
+	});
 	return key;
 };
 
 token.decToken = function(tkn) {
-	var decode = jwt.verify(tkn, secreto);
+	var decode = jwt.verify(tkn, secret);
 	return decode;
 };
 
