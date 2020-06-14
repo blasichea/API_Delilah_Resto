@@ -19,11 +19,7 @@ router.post('/login', function(req, res) {
 	
 	usr
 		.then(us => {
-			if (!us) {
-				res.status(400);
-				return res.json({mensaje: "Usuario o email no encontrado"});
-			}
-			if (!(us.password === password)) {
+			if (!us || !(us.password === password)) {
 				res.status(400);
 				return res.json({mensaje: "Usuario o contraseña incorrectos"});
 			}
