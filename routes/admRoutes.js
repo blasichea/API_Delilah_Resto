@@ -1,6 +1,7 @@
 var router = require('express').Router();
 const db = require('../models/db');
 const jwt = require('../jwt/token');
+const { product, user } = require('../models/db');
 
 router.use(function(req, res, next) {
 	if(!req.headers.token) {
@@ -159,5 +160,99 @@ router.route('/products/:id')
 			});
 	});
 
+
+/* 	RUTAS DE PEDIDOS */
+
+router.route('/orders')
+
+	.get(function(req, res) {
+		db.order.findAll({ include: [ db.user, db.product ] })
+			.then(or => {
+				res.json(or);
+			})
+			.catch(err => {
+				console.error("Error al obtener lista de pedidos", err);
+			});
+	})
+
+	.post(function(req, res) {
+		const { userId, detail, paying, products } = req.body;
+
+		if (!(user && detail && paying && products)) {
+			res.status(400);
+			return res.json({mensaje: "Datos insuficientes"});
+		}
+
+		db.order.create({
+			status: "Iniciado",
+			time: Date.now(),
+			detail,
+			paying,
+			userId
+		})
+			.then(or => {
+				or.setProducts(products)
+					.then(result => {
+						res.json(or);
+					});
+			})
+			.catch(err => {
+				console.error("Error al generar pedido",err);
+			});
+	});
+
+
+	router.route('/orders/:id')
+
+		.get(function(req, res) {
+			var id = req.params.id;
+
+			db.order.findByPk(id, { include: [ db.user ] })
+				.then(or => {
+					res.json(or);
+				})
+				.catch(err => {
+					console.error("Error buscando orden", err);
+				});
+		})
+
+		.put(function(req, res) {
+			const {status, detail, paying, user, products} = req.body;
+			var id = req.params.id;
+			var newRec = {};
+
+			if (status) newRec.status = status;
+			if (detail) newRec.detail = detail;
+			if (paying) newRec.paying = paying;
+			if (user) newRec.userId = user;
+
+			db.order.findByPk(id)
+				.then(or => {
+					or.update(newRec)
+						.then(result => {
+							if (result === 0) {
+								return res.json({mensaje: "No se actualizó el pedido"});
+							}
+							if (products) {
+								or.setProducts(products);
+							}
+							res.json(or);
+						})
+				})
+				.catch(err => {
+					console.error("Error al modificar producto", err);
+				});
+		})
+
+		.delete(function(req, res) {
+			var id = req.params.id;
+			db.order.destroy({where: {id: id}})
+				.then(del => {
+					res.json({mensaje:"Se borro pedido"});
+				})
+				.catch(err => {
+					console.error("Error al eliminar pedido", err);
+				});
+		});
 
 module.exports = router;
