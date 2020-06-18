@@ -13,24 +13,8 @@ token.codToken = function(payload) {
 };
 
 token.decToken = function(tkn) {
-	try {
-		var payload = jwt.verify(tkn, secret);
-	} catch (error) {
-		console.error("Token invalido", error.message);
-	}
-	
-	return payload.data;
-};
-
-token.refresh = function(refTkn) {
-	try {
-		var payload = jwt.verify(refTkn, secret);
-		var newToken = jwt.sign({data: payload.data}, secret, {expiresIn: 60*15});
-	} catch (error) {
-		console.error("Token invalido", error.message);
-	}
-
-	return newToken;
+	var decode = jwt.verify(tkn, secret);
+	return decode;
 };
 
 module.exports = token;
