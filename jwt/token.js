@@ -22,15 +22,4 @@ token.decToken = function(tkn) {
 	return payload.data;
 };
 
-token.refresh = function(refTkn) {
-	try {
-		var payload = jwt.verify(refTkn, secret);
-		var newToken = jwt.sign({data: payload.data}, secret, {expiresIn: 60*15});
-	} catch (error) {
-		console.error("Token invalido", error.message);
-	}
-
-	return newToken;
-};
-
 module.exports = token;
