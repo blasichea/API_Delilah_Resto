@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize');
-const sequelize = new Sequelize('mysql://acamica:AcamicA%232020@localhost:3306/delilah_resto');
+const {host, port, database, user, pass, dialect} = require("./config").db;
+const sequelize = new Sequelize(`${dialect}://${user}:${pass}@${host}:${port}/${database}`);
 const db = {};
 
 db.Sequelize = Sequelize;
