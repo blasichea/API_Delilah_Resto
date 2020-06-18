@@ -6,7 +6,6 @@ var token = {};
 token.codToken = function(payload) {
 	try {
 		var key = jwt.sign({data: payload}, secret, {expiresIn: 60*15});
-		var keyRefresh = jwt.sign({data: payload}, secret, {expiresIn: 60*60*12});
 	} catch (error) {
 		console.error("Error al crear Token", error.message);
 	}
