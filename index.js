@@ -1,9 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const jwt = require('./jwt/token');
-const path = require('path');
-const db = require('./models/db');
-const config = require('./config').server;
+const config = require("./config").server;
 
 var app = express();
 

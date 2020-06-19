@@ -5,9 +5,9 @@ var config = {
 	db: {
 		host: "localhost",
 		port: "3306",
-		database: "delilah_resto",
+		database: "delilah",
 		user: "acamica",
-		pass: "AcamicA%232020",
+		pass: "AcamicA.2020",
 		dialect: "mysql"
 	},
 	server: {
