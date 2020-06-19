@@ -1,5 +1,5 @@
 const mysql = require('mysql2/promise');
-const {host,port, database, user, pass} = require('./config').db;
+const {host,port, database, user, pass} = require('./config/config').db;
 
 
 

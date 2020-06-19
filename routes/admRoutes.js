@@ -1,14 +1,18 @@
 var router = require('express').Router();
 const db = require('../models/db');
 const jwt = require('../jwt/token');
-const { product, user } = require('../models/db');
 
 router.use(function(req, res, next) {
 	if(!req.headers.token) {
 		res.status(401);
 		return res.json("Se requiere Token");
 	}
-	var id = jwt.decToken(req.headers.token).user;
+	var payload = jwt.decToken(req.headers.token);
+	if (!payload) return res.json("token invalido");
+
+	if (!payload.admin) return res.json("Acceso denegado");
+
+	req.user = payload;
 	next();
 })
 

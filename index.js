@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const jwt = require('./jwt/token');
-const config = require("./config").server;
+const config = require("./config/config").server;
 
 var app = express();
 
@@ -9,7 +9,7 @@ app.use(bodyParser.json());
 
 app.use('/', require('./routes/signRoutes'));
 app.use('/adm', require('./routes/admRoutes'));
-/* app.use('/user', require('./routes/userRoutes')); */
+app.use('/user', require('./routes/userRoutes'));
 
 var token = jwt.codToken(16);
 console.log(token);
