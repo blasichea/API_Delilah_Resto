@@ -1,8 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const jwt = require('./jwt/token');
-const path = require('path');
-const db = require('./models/db');
+const config = require("./config").server;
 
 var app = express();
 
@@ -18,6 +17,6 @@ var user = jwt.decToken(token);
 console.log(user);
 
 /* SERVIDOR ESCUCHANDO */
-app.listen(3000, () => {
+app.listen(config.port, () => {
 	console.log('Servidor Iniciado');
 });
