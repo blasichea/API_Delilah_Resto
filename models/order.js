@@ -1,5 +1,3 @@
-const { Sequelize } = require("sequelize/types");
-
 module.exports = (sequelize, DataTypes) => {
 	var state = ["Nuevo", "Preparando", "Enviado", "Entregado", "Cancelado"];
 	var pay = ["Cash", "Card", "Virtual", "Debit"];
@@ -12,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
 		},
 		time: {
 			type: DataTypes.DATE,
-			defaultValue: Sequelize.NOW
+			defaultValue: sequelize.NOW
 		},
 		detail: DataTypes.TEXT,
 		paying: {
