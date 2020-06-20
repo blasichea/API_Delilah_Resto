@@ -10,7 +10,7 @@ router.use(function(req, res, next) {
 	var payload = jwt.decToken(req.headers.token);
 	if (!payload) return res.json("token invalido");
 
-	if (!payload.admin) return res.json("Acceso denegado");
+	if (!(payload.role === "admin")) return res.json("Acceso denegado");
 
 	req.user = payload;
 	next();
@@ -40,19 +40,16 @@ router.route('/users/:id')
 				console.error("No se pudo obtener el usuario", err);
 			})
 	})
-/*	¿¿¿¿TIENE SENTIDO????
-	.post(function(req, res) {
-		
-	})
-*/
+
 	.put(function(req, res) {
-		const {user, name, email, tel, address, password} = req.body;
+		const {user, name, email, role, tel, address, password} = req.body;
 		var id = req.params.id;
 		var newRec = {};
 
 		if (user) newRec.user = user;
 		if (name) newRec.name = name;
 		if (email) newRec.email = email;
+		if (role) newRec.role = role;
 		if (tel) newRec.tel = tel;
 		if (address) newRec.address = address;
 		if (password) newRec.password = password;
@@ -179,32 +176,6 @@ router.route('/orders')
 			});
 	})
 
-	.post(function(req, res) {
-		const { userId, detail, paying, products } = req.body;
-
-		if (!(user && detail && paying && products)) {
-			res.status(400);
-			return res.json({mensaje: "Datos insuficientes"});
-		}
-
-		db.order.create({
-			status: "Iniciado",
-			time: Date.now(),
-			detail,
-			paying,
-			userId
-		})
-			.then(or => {
-				or.setProducts(products)
-					.then(result => {
-						res.json(or);
-					});
-			})
-			.catch(err => {
-				console.error("Error al generar pedido",err);
-			});
-	});
-
 
 	router.route('/orders/:id')
 
@@ -221,14 +192,11 @@ router.route('/orders')
 		})
 
 		.put(function(req, res) {
-			const {status, detail, paying, user, products} = req.body;
+			const { status } = req.body;
 			var id = req.params.id;
 			var newRec = {};
 
 			if (status) newRec.status = status;
-			if (detail) newRec.detail = detail;
-			if (paying) newRec.paying = paying;
-			if (user) newRec.userId = user;
 
 			db.order.findByPk(id)
 				.then(or => {
@@ -236,9 +204,6 @@ router.route('/orders')
 						.then(result => {
 							if (result === 0) {
 								return res.json({mensaje: "No se actualizó el pedido"});
-							}
-							if (products) {
-								or.setProducts(products);
 							}
 							res.json(or);
 						})

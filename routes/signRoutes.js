@@ -24,7 +24,10 @@ router.post('/login', function(req, res) {
 				return res.json({mensaje: "Usuario o contraseña incorrectos"});
 			}
 
-			var token = jwt.codToken(us.id);
+			var token = jwt.codToken({
+				id: us.id,
+				role: us.role
+			});
 			res.json({
 				user: us.user,
 				userId: us.id,
