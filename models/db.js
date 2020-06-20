@@ -15,6 +15,25 @@ db.order.belongsTo(db.user);
 db.order.belongsToMany(db.product, {through: "orderProduct"});
 db.product.belongsToMany(db.order, {through: "orderProduct"});
 
+db.user.findOrCreate({
+	where: {user: "admin"},
+	defaults: {
+		name: "Mr. Admin",
+		email: "admin@admin.com",
+		role: "admin",
+		tel: "0351155156157",
+		address: "Av. Administrador 777",
+		password: "admin123"
+	}
+})
+	.then(result => {
+		if (result[1]) {
+			console.log("admin fue creado");
+		} else {
+			console.log("admin ya existe");
+		}
+	})
+
 sequelize.sync();
 
 module.exports = db;
