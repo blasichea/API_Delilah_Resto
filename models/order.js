@@ -1,10 +1,24 @@
-module.exports = (sequelize, DataTypes) => {
+const { Sequelize } = require("sequelize/types");
 
+module.exports = (sequelize, DataTypes) => {
+	var state = ["Nuevo", "Preparando", "Enviado", "Entregado", "Cancelado"];
+	var pay = ["Cash", "Card", "Virtual", "Debit"];
+	
 	var Order = sequelize.define('order', {
-		status: DataTypes.STRING,
-		time: DataTypes.DATE,
+		status: {
+			type: DataTypes.ENUM,
+			values: state,
+			defaultValue: "Nuevo"
+		},
+		time: {
+			type: DataTypes.DATE,
+			defaultValue: Sequelize.NOW
+		},
 		detail: DataTypes.TEXT,
-		paying: DataTypes.STRING
+		paying: {
+			type: DataTypes.ENUM,
+			values: pay
+		}
 	});
 
 	return Order;
