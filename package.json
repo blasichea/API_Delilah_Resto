@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dbcreate": "node dbConfig",
+    "config": "node dbConfig && node models/db",
     "start": "node index"
   },
   "keywords": [],
