@@ -1,14 +1,26 @@
 {
-  "name": "delilah_resto",
+  "name": "resto",
+  "config": {
+    "svrport": "3003",
+    "dbport": "3306",
+    "dbuser": "root",
+    "dbpass": "",
+    "dbname": "resto"
+  },
   "version": "1.0.0",
-  "description": "",
+  "description": "API Resto ",
   "main": "index.js",
   "scripts": {
-    "config": "node dbConfig && node models/db",
+    "config": "node config/dbConfig && node models/db",
+    "create": "node config/dbCreate",
     "start": "node index"
   },
   "keywords": [],
   "author": "Blasiche Andres",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/blasichea/Delilah_Resto"
+  },
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.0",
