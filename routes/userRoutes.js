@@ -1,6 +1,8 @@
 var router = require('express').Router();
 const db = require('../models/db');
+const bcrypt = require('bcrypt');
 const jwt = require('../jwt/token');
+const config = require('../config/config').bcrypt;
 
 router.use(function(req, res, next) {
 	if(!req.headers.token) {
@@ -9,7 +11,10 @@ router.use(function(req, res, next) {
 	}
 	
 	var payload = jwt.decToken(req.headers.token);
-	if (!payload) return res.json("Token invalido");
+	if (!payload) {
+		res.status(400);
+		return res.json("Token invalido");
+	}
 
 	db.user.findByPk(payload.id)
 		.then(us => {
@@ -21,6 +26,8 @@ router.use(function(req, res, next) {
 			next();
 		})
 		.catch(err => {
+			res.status(500);
+			res.json("Hubo un error, intenta de nuevo");
 			console.error("Error al procesar usuario", err);
 		});
 });
@@ -49,18 +56,22 @@ router.route('/info')
 			return res.json({mensaje: "Falta nuevo password"});
 		}
 
-		db.user.update({password: password}, {where:{id: req.user.id}})
-			.then(us => {
-				if (us === 0) {
-					res.status(400);
-					return res.json({mensaje: "No se actualizaron datos"});
-				}
+		bcrypt.hash(password, config.rounds).then(pass =>{
+			db.user.update({password: pass}, {where:{id: req.user.id}})
+				.then(us => {
+					if (us === 0) {
+						res.status(400);
+						return res.json({mensaje: "No se actualizaron datos"});
+					}
 
-				res.json({mensaje: "Actualización exitosa"});
-			})
-			.catch(err => {
-				console.error("Error actualizando datos", err);
-			});
+					res.json({mensaje: "Actualización exitosa"});
+				})
+		})
+		.catch(err => {
+			res.status(500);
+			res.json("Hubo un error, intenta de nuevo");
+			console.error("Error actualizando datos", err);
+		});
 	})
 
 
@@ -69,6 +80,11 @@ router.get('/products', function(req, res) {
 	db.product.findAll()
 		.then(pr => {
 			res.json(pr);
+		})
+		.catch(err => {
+			res.status(500);
+			res.json("Hubo un error, intenta de nuevo");
+			console.error("Error buscando productos", err);
 		});
 });
 
@@ -77,6 +93,11 @@ router.get('/products/:id', function(req, res) {
 	db.product.findByPk(req.params.id)
 		.then(pr => {
 			res.json(pr);
+		})
+		.catch(err => {
+			res.status(500);
+			res.json("Hubo un error, intenta de nuevo");
+			console.error("Error buscando producto", err);
 		});
 });
 
@@ -93,6 +114,8 @@ router.route('/orders')
 				res.json(or);
 			})
 			.catch(err => {
+				res.status(500);
+				res.json("Hubo un error, intenta de nuevo");
 				console.error("Error al obtener lista de pedidos", err);
 			});
 	})
@@ -116,6 +139,8 @@ router.route('/orders')
 					});
 			})
 			.catch(err => {
+				res.status(500);
+				res.json("Hubo un error, intenta de nuevo");
 				console.error("Error al generar pedido",err);
 			});
 	});

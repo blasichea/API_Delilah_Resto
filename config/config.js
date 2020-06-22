@@ -12,6 +12,9 @@ var config = {
 	},
 	server: {
 		port: process.env.npm_package_config_svrport || "3000"
+	},
+	bcrypt: {
+		rounds: 10
 	}
 }
 

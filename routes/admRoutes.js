@@ -1,6 +1,8 @@
 var router = require('express').Router();
 const db = require('../models/db');
+const bcrypt = require('bcrypt');
 const jwt = require('../jwt/token');
+const config = require('../config/config').bcrypt;
 
 router.use(function(req, res, next) {
 	if(!req.headers.token) {
@@ -8,9 +10,15 @@ router.use(function(req, res, next) {
 		return res.json("Se requiere Token");
 	}
 	var payload = jwt.decToken(req.headers.token);
-	if (!payload) return res.json("token invalido");
+	if (!payload) {
+		res.status(400);
+		return res.json("token invalido");
+	}
 
-	if (!(payload.role === "admin")) return res.json("Acceso denegado");
+	if (!(payload.role === "admin")) {
+		res.status(400);
+		return res.json("Acceso denegado");
+	}
 
 	req.user = payload;
 	next();
@@ -23,6 +31,8 @@ router.get('/users', function(req, res) {
 			res.json(us);
 		})
 		.catch(err => {
+			res.status(500);
+			res.json("Hubo un error, intenta de nuevo");
 			console.error("Error al obtener lista de usuarios", err);
 		});
 });
@@ -41,6 +51,8 @@ router.route('/users/:id')
 				res.json(us);
 			})
 			.catch(err => {
+				res.status(500);
+				res.json("Hubo un error, intenta de nuevo");
 				console.error("No se pudo obtener el usuario", err);
 			})
 	})
@@ -56,19 +68,31 @@ router.route('/users/:id')
 		if (role) newRec.role = role;
 		if (tel) newRec.tel = tel;
 		if (address) newRec.address = address;
-		if (password) newRec.password = password;
-
-		db.user.update(newRec, {where: {id: id}})
-			.then(us => {
-				if (us === 0) {
+		if (password) {
+			resetPass(newRec, password, id).then(result => {
+				if (result === 0) {
 					res.status(400);
 					return res.json({mensaje: "no se actualizaron datos"});
 				}
 				res.json({mensaje: "Actualización exitosa"});
 			})
+		} else {
+			bcrypt.hash(password, config.rounds).then(pass => {
+				db.user.update(newRec, {where: {id: id}})
+					.then(us => {
+						if (us === 0) {
+							res.status(400);
+							return res.json({mensaje: "no se actualizaron datos"});
+						}
+						res.json({mensaje: "Actualización exitosa"});
+					})
+			})
 			.catch(err => {
+				res.status(500);
+				res.json("Hubo un error, intenta de nuevo");
 				console.error("Error al modificar usuario", err);
 			});
+		}
 	})
 
 	.delete(function(req, res) {
@@ -82,6 +106,8 @@ router.route('/users/:id')
 				res.json({mensaje:"Se borro usuario"});
 			})
 			.catch(err => {
+				res.status(500);
+				res.json("Hubo un error, intenta de nuevo");
 				console.error("Error al eliminar usuario", err);
 			});
 	});
@@ -96,6 +122,8 @@ router.route('/products')
 				res.json(pr);
 			})
 			.catch(err => {
+				res.status(500);
+				res.json("Hubo un error, intenta de nuevo");
 				console.error("Error al obtener lista de productos", err);
 			});
 	})
@@ -116,6 +144,8 @@ router.route('/products')
 				res.json(result);
 			})
 			.catch(err => {
+				res.status(500);
+				res.json("Hubo un error, intenta de nuevo");
 				console.error("Error al crear producto", err);
 			});
 	});
@@ -135,6 +165,8 @@ router.route('/products/:id')
 				res.json(pr);
 			})
 			.catch(err => {
+				res.status(500);
+				res.json("Hubo un error, intenta de nuevo");
 				console.error("Error buscando producto", err);
 			});
 	})
@@ -157,6 +189,8 @@ router.route('/products/:id')
 				res.json(pr);
 			})
 			.catch(err => {
+				res.status(500);
+				res.json("Hubo un error, intenta de nuevo");
 				console.error("Error al modificar producto", err);
 			});
 	})
@@ -172,6 +206,8 @@ router.route('/products/:id')
 				res.json({mensaje:"Se borro producto"});
 			})
 			.catch(err => {
+				res.status(500);
+				res.json("Hubo un error, intenta de nuevo");
 				console.error("Error al eliminar producto", err);
 			});
 	});
@@ -187,6 +223,8 @@ router.route('/orders')
 				res.json(or);
 			})
 			.catch(err => {
+				res.status(500);
+				res.json("Hubo un error, intenta de nuevo");
 				console.error("Error al obtener lista de pedidos", err);
 			});
 	})
@@ -206,6 +244,8 @@ router.route('/orders')
 					res.json(or);
 				})
 				.catch(err => {
+					res.status(500);
+					res.json("Hubo un error, intenta de nuevo");
 					console.error("Error buscando orden", err);
 				});
 		})
@@ -226,12 +266,15 @@ router.route('/orders')
 					or.update(newRec)
 						.then(result => {
 							if (result === 0) {
+								res.status(400);
 								return res.json({mensaje: "No se actualizó el pedido"});
 							}
 							res.json(or);
 						})
 				})
 				.catch(err => {
+					res.status(500);
+					res.json("Hubo un error, intenta de nuevo");
 					console.error("Error al modificar producto", err);
 				});
 		})
@@ -247,8 +290,31 @@ router.route('/orders')
 					res.json({mensaje:"Se borro pedido"});
 				})
 				.catch(err => {
+					res.status(500);
+					res.json("Hubo un error, intenta de nuevo");
 					console.error("Error al eliminar pedido", err);
 				});
 		});
+
+
+function resetPass(record, password, id) {
+	bcrypt.hash(password, config.rounds).then(pass => {
+		record.password = pass;
+		db.user.update(record, {where: {id: id}})
+			.then(us => {
+				return us;
+			})
+			.catch(err => {
+				res.status(500);
+				res.json("Hubo un error, intenta de nuevo");
+				console.error("Error al actualizar usuario", err);
+			});
+	})
+	.catch(err => {
+		res.status(500);
+		res.json("Hubo un error, intenta de nuevo");
+		console.error("Error al modificar usuario", err);
+	});
+}
 
 module.exports = router;
