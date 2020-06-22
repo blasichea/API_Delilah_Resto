@@ -1,4 +1,6 @@
 var router = require('express').Router();
+const bcrypt = require('bcrypt');
+const config = require('../config/config').bcrypt;
 const jwt = require('../jwt/token');
 const db = require ('../models/db');
 
@@ -19,22 +21,31 @@ router.post('/login', function(req, res) {
 	
 	usr
 		.then(us => {
-			if (!us || !(us.password === password)) {
+			if (!us) {
 				res.status(400);
 				return res.json({mensaje: "Usuario o contraseña incorrectos"});
 			}
-
-			var token = jwt.codToken({
-				id: us.id,
-				role: us.role
-			});
-			res.json({
-				user: us.user,
-				userId: us.id,
-				token: token
-			});
+			bcrypt.compare(password, us.password)
+				.then(pass => {
+					if (!pass) {
+						res.status(400);
+						return res.json({mensaje: "Usuario o contraseña incorrectos"});
+					}
+		
+					var token = jwt.codToken({
+						id: us.id,
+						role: us.role
+					});
+					res.json({
+						user: us.user,
+						userId: us.id,
+						token: token
+					});
+				})
 		})
 		.catch(err => {
+			res.status(500);
+			res.json("Hubo un error, intenta de nuevo");
 			console.error("Error en proceso Login", err);
 		});
 });
@@ -59,24 +70,46 @@ router.post('/signup', function(req, res) {
 							res.status(400);
 							res.json({mensaje: "El email ya existe"});
 						}
-
-						db.user.create({
-							user,
-							name,
-							email,
-							tel,
-							address,
-							password
+						bcrypt.hash(password, config.rounds).then(pass => {
+							db.user.create({
+								user,
+								name,
+								email,
+								tel,
+								address,
+								password: pass
+							})
+								.then(result => {
+									res.json(result);
+								})
+								.catch(err => {
+									res.status(500);
+									console.error("Error al crear usuario", err);
+								});
 						})
-							.then(result => {
-								res.json(result);
-							});
-					});
+					})
 			}
 		})
 		.catch(err => {
+			res.status(500);
+			res.json("Hubo un error, intenta de nuevo");
 			console.error("Error al crear usuario", err);
 		});
+});
+
+
+router.post('/refresh', function(req, res) {
+	if(!req.headers.token) {
+		res.status(401);
+		return res.json("Se requiere Token");
+	}
+	var payload = jwt.decToken(req.headers.token);
+	if (!payload) {
+		res.status(400);
+		return res.json("Token invalido");
+	}
+	var token = jwt.decToken(payload);
+	res.json({token: token})
 });
 
 
