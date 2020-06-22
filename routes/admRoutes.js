@@ -34,6 +34,10 @@ router.route('/users/:id')
 		var id = req.params.id;
 		db.user.findByPk(id)
 			.then(us => {
+				if (!us) {
+					res.status(400);
+					return res.json("No se encontro usuario");
+				}
 				res.json(us);
 			})
 			.catch(err => {
@@ -60,7 +64,6 @@ router.route('/users/:id')
 					res.status(400);
 					return res.json({mensaje: "no se actualizaron datos"});
 				}
-
 				res.json({mensaje: "Actualización exitosa"});
 			})
 			.catch(err => {
@@ -71,7 +74,11 @@ router.route('/users/:id')
 	.delete(function(req, res) {
 		var id = req.params.id;
 		db.user.destroy({where: {id: id}})
-			.then(del => {
+			.then(us => {
+				if (!us) {
+					res.status(400);
+					return res.json("No se encontro usuario");
+				}
 				res.json({mensaje:"Se borro usuario"});
 			})
 			.catch(err => {
@@ -143,6 +150,10 @@ router.route('/products/:id')
 
 		db.product.update(newRec, {where: {id: id}})
 			.then(pr => {
+				if (!pr) {
+					res.status(404);
+					return res.json({mensaje: "Producto no encontrado"});
+				}
 				res.json(pr);
 			})
 			.catch(err => {
@@ -154,6 +165,10 @@ router.route('/products/:id')
 		var id = req.params.id;
 		db.product.destroy({where: {id: id}})
 			.then(del => {
+				if (!pr) {
+					res.status(404);
+					return res.json({mensaje: "Producto no encontrado"});
+				}
 				res.json({mensaje:"Se borro producto"});
 			})
 			.catch(err => {
@@ -184,6 +199,10 @@ router.route('/orders')
 
 			db.order.findByPk(id, { include: [ db.user ] })
 				.then(or => {
+					if (!or) {
+						res.status(400);
+						return res.json("No se encontro pedido");
+					}
 					res.json(or);
 				})
 				.catch(err => {
@@ -200,6 +219,10 @@ router.route('/orders')
 
 			db.order.findByPk(id)
 				.then(or => {
+					if (!or) {
+						res.status(404);
+						return res.json({mensaje: "Pedido no encontrado"});
+					}
 					or.update(newRec)
 						.then(result => {
 							if (result === 0) {
@@ -217,6 +240,10 @@ router.route('/orders')
 			var id = req.params.id;
 			db.order.destroy({where: {id: id}})
 				.then(del => {
+					if (!or) {
+						res.status(404);
+						return res.json({mensaje: "Pedido no encontrado"});
+					}
 					res.json({mensaje:"Se borro pedido"});
 				})
 				.catch(err => {

@@ -4,14 +4,14 @@ var config = {
 	},
 	db: {
 		host: "localhost",
-		port: "3306",
-		database: "delilah_resto",
-		user: "acamica",
-		pass: "AcamicA.2020",
+		port: process.env.npm_package_config_dbport ||"3306",
+		database: process.env.npm_package_config_dbname || "delilah_resto",
+		user: process.env.npm_package_config_dbuser || "acamica",
+		pass: process.env.npm_package_config_dbpass || "AcamicA.2020",
 		dialect: "mysql"
 	},
 	server: {
-		port: "3000"
+		port: process.env.npm_package_config_svrport || "3000"
 	}
 }
 

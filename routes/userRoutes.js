@@ -8,29 +8,36 @@ router.use(function(req, res, next) {
 		return res.json("Se requiere Token");
 	}
 	
-	var payload = jwt.decToken(req.headers.token).user;
-	/* caduco?? */
+	var payload = jwt.decToken(req.headers.token);
 	if (!payload) return res.json("Token invalido");
 
 	db.user.findByPk(payload.id)
 		.then(us => {
+			if (!us) {
+				res.status(404);
+				return res.json("No se encontro usuario");
+			}
 			req.user = us;
+			next();
 		})
-	
-	next();
+		.catch(err => {
+			console.error("Error al procesar usuario", err);
+		});
 });
 
 
 router.route('/info')
 	
 	.get(function(req, res) {
+		const { id, user, name, email, role, tel, address } = req.user;
 		res.json({
-			user: req.user.user,
-			name: req.user.name,
-			email: req.user.email,
-			role: req.user.role,
-			tel: req.user.tel,
-			address: req.user.address
+			id,
+			user,
+			name,
+			email,
+			role,
+			tel,
+			address
 		});
 	})
 
@@ -57,6 +64,7 @@ router.route('/info')
 	})
 
 
+/* 	RUTAS PARA VER PRODUCTOS */
 router.get('/products', function(req, res) {
 	db.product.findAll()
 		.then(pr => {
@@ -97,24 +105,15 @@ router.route('/orders')
 			return res.json({mensaje: "Datos insuficientes"});
 		}
 		var userId = req.user.id;
-		db.product.findByPk(products)
-			.then(pr => {
-				var names = [];
-				pr.forEach(element => {
-					names.push(element);
-				});
-				var detail = names.join(" + ");
-				db.order.create({
-					detail,
-					paying,
-					userId
-				})
-					.then(or => {
-						or.setProducts(products)
-							.then(result => {
-								res.json(or);
-							});
-					})
+		db.order.create({
+			paying,
+			userId
+		})
+			.then(or => {
+				or.setProducts(products)
+					.then(result => {
+						res.json(or);
+					});
 			})
 			.catch(err => {
 				console.error("Error al generar pedido",err);

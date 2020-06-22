@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
 	var state = ["Nuevo", "Preparando", "Enviado", "Entregado", "Cancelado"];
-	var pay = ["Cash", "Card", "Virtual", "Debit"];
+	var pay = ["Efectivo", "Tarjeta", "Virtual", "Debito"];
 	
 	var Order = sequelize.define('order', {
 		status: {
@@ -12,10 +12,10 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.DATE,
 			defaultValue: sequelize.NOW
 		},
-		detail: DataTypes.TEXT,
 		paying: {
 			type: DataTypes.ENUM,
-			values: pay
+			values: pay,
+			defaultValue: "Efectivo"
 		}
 	});
 
