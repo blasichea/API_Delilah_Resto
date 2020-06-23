@@ -70,18 +70,23 @@ Archivo **"config.js"**
 Una vez que están todos los valores de configuración deseados podemos incializar la base de datos, cargar algunos datos de prueba y luego ejecutar el servidor.  
 
 ### Inicializar base de datos
+Se puede inicializar sin datos, solo con el usuario **"admin"** o cargar con datos de prueba.  
 
-Ejecutar:  
+Para cargar datos, ejecutar:  
+
+	dbfill=true npm run config
+
+Sin datos, ejecutar:  
 
 	npm run config
 
 Ahora ya está creada la base y las tablas necesarias.  
-Con el siguiente comando crearemos un usuario administrador y datos de pruebas en las diferentes tablas.
-
-	dbfill=true npm run create
 
 - El usuario administrador es **"admin"** y su contraseña es **"admin123"**  
+- Los otros usuarios "NO tienen password" se les puede poner una haciendo PUT.  
 
+
+### Ejecutar servidor
 Ahora si está todo listo para iniciar el servidor.  
 Ejecutar:
 
