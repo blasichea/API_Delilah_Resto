@@ -136,8 +136,14 @@ router.route('/orders')
 				or.setProducts(products)
 					.then(result => {
 						res.json(or);
+					})
+					.catch(err => {
+						res.status(400);
+						res.json("Hubo un error, verificar productos");
+						console.error("Error en productos",err);
 					});
 			})
+			.then()
 			.catch(err => {
 				res.status(500);
 				res.json("Hubo un error, intenta de nuevo");

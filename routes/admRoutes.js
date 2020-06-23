@@ -271,6 +271,11 @@ router.route('/orders')
 							}
 							res.json(or);
 						})
+						.catch(err => {
+							res.status(500);
+							res.json("Hubo un error, intenta de nuevo");
+							console.error("Error al modificar producto", err);
+						});
 				})
 				.catch(err => {
 					res.status(500);
