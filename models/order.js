@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
 		},
 		time: {
 			type: DataTypes.DATE,
-			defaultValue: sequelize.NOW
+			defaultValue: DataTypes.NOW
 		},
 		paying: {
 			type: DataTypes.ENUM,
