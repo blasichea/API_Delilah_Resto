@@ -91,3 +91,7 @@ Ahora si está todo listo para iniciar el servidor.
 Ejecutar:
 
 	npm start
+
+## Documentación openApi
+
+https://app.swaggerhub.com/apis-docs/blasichea/Delilah-resto/1.0.0#/
