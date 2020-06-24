@@ -94,4 +94,7 @@ Ejecutar:
 
 ## Documentación openApi
 
-https://app.swaggerhub.com/apis-docs/blasichea/Delilah-resto/1.0.0#/
+### https://app.swaggerhub.com/apis-docs/blasichea/Delilah-resto/1.0.0#/
+
+## Testeo
+Para hacer pruebas, en la carpeta **"test"** se encuentra una colección de **"POSTMAN"** con todos los endpoint
