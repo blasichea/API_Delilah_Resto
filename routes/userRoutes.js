@@ -5,12 +5,12 @@ const jwt = require('../jwt/token');
 const config = require('../config/config').bcrypt;
 
 router.use(function(req, res, next) {
-	if(!req.headers.token) {
+	if(!req.headers.authorization) {
 		res.status(401);
 		return res.json("Se requiere Token");
 	}
-	
-	var payload = jwt.decToken(req.headers.token);
+	var token = req.headers.authorization.split(" ")[1];
+	var payload = jwt.decToken(token);
 	if (!payload) {
 		res.status(400);
 		return res.json("Token invalido");

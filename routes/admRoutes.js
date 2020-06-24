@@ -5,7 +5,7 @@ const jwt = require('../jwt/token');
 const config = require('../config/config').bcrypt;
 
 router.use(function(req, res, next) {
-	if(!req.headers.auto) {
+	if(!req.headers.authorization) {
 		res.status(401);
 		return res.json("Se requiere Token");
 	}
@@ -92,21 +92,19 @@ router.route('/users/:id')
 				console.error("Error al modificar usuario", err);
 			});
 		} else {
-			bcrypt.hash(password, config.rounds).then(pass => {
-				db.user.update(newRec, {where: {id: id}})
-					.then(us => {
-						if (us === 0) {
-							res.status(400);
-							return res.json({mensaje: "no se actualizaron datos"});
-						}
-						res.json({mensaje: "Actualización exitosa"});
-					})
-			})
-			.catch(err => {
-				res.status(500);
-				res.json("Hubo un error, intenta de nuevo");
-				console.error("Error al modificar usuario", err);
-			});
+			db.user.update(newRec, {where: {id: id}})
+				.then(us => {
+					if (us === 0) {
+						res.status(400);
+						return res.json({mensaje: "no se actualizaron datos"});
+					}
+					res.json({mensaje: "Actualización exitosa"});
+				})
+				.catch(err => {
+					res.status(500);
+					res.json("Hubo un error, intenta de nuevo");
+					console.error("Error al modificar usuario", err);
+				});
 		}
 	})
 

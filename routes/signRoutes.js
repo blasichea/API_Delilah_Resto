@@ -113,7 +113,7 @@ router.post('/refresh', function(req, res) {
 		res.status(400);
 		return res.json("Token invalido");
 	}
-	var token = jwt.decToken(payload);
+	var token = jwt.codToken(payload);
 	res.json({token: token})
 });
 
