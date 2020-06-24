@@ -36,6 +36,10 @@ router.post('/login', function(req, res) {
 						id: us.id,
 						role: us.role
 					});
+					if (!token) {
+						res.status(500);
+						return res.json("Error al crear token");
+					}
 					res.json({
 						user: us.user,
 						userId: us.id,
@@ -99,11 +103,12 @@ router.post('/signup', function(req, res) {
 
 
 router.post('/refresh', function(req, res) {
-	if(!req.headers.token) {
+	if(!req.headers.authorization) {
 		res.status(401);
 		return res.json("Se requiere Token");
 	}
-	var payload = jwt.decToken(req.headers.token);
+	var auth = req.headers.authorization.split(" ")[1];
+	var payload = jwt.decToken(auth);
 	if (!payload) {
 		res.status(400);
 		return res.json("Token invalido");

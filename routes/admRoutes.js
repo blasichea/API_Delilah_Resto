@@ -5,18 +5,19 @@ const jwt = require('../jwt/token');
 const config = require('../config/config').bcrypt;
 
 router.use(function(req, res, next) {
-	if(!req.headers.token) {
+	if(!req.headers.auto) {
 		res.status(401);
 		return res.json("Se requiere Token");
 	}
-	var payload = jwt.decToken(req.headers.token);
+	var token = req.headers.authorization.split(" ")[1];
+	var payload = jwt.decToken(token);
 	if (!payload) {
 		res.status(400);
 		return res.json("token invalido");
 	}
 
 	if (!(payload.role === "admin")) {
-		res.status(400);
+		res.status(403);
 		return res.json("Acceso denegado");
 	}
 
@@ -69,13 +70,27 @@ router.route('/users/:id')
 		if (tel) newRec.tel = tel;
 		if (address) newRec.address = address;
 		if (password) {
-			resetPass(newRec, password, id).then(result => {
-				if (result === 0) {
-					res.status(400);
-					return res.json({mensaje: "no se actualizaron datos"});
-				}
-				res.json({mensaje: "Actualización exitosa"});
+			bcrypt.hash(password, config.rounds).then(pass => {
+				newRec.password = pass;
+				db.user.update(newRec, {where: {id: id}})
+					.then(us => {
+						if (us === 0) {
+							res.status(400);
+							return res.json({mensaje: "No se actualizaron datos"});
+						}
+						res.json({mensaje: "Actualización exitosa"});
+					})
+					.catch(err => {
+						res.status(500);
+						res.json("Hubo un error, intenta de nuevo");
+						console.error("Error al actualizar usuario", err);
+					});
 			})
+			.catch(err => {
+				res.status(500);
+				res.json("Hubo un error, intenta de nuevo");
+				console.error("Error al modificar usuario", err);
+			});
 		} else {
 			bcrypt.hash(password, config.rounds).then(pass => {
 				db.user.update(newRec, {where: {id: id}})
@@ -100,7 +115,7 @@ router.route('/users/:id')
 		db.user.destroy({where: {id: id}})
 			.then(us => {
 				if (!us) {
-					res.status(400);
+					res.status(404);
 					return res.json("No se encontro usuario");
 				}
 				res.json({mensaje:"Se borro usuario"});
@@ -182,11 +197,11 @@ router.route('/products/:id')
 
 		db.product.update(newRec, {where: {id: id}})
 			.then(pr => {
-				if (!pr) {
-					res.status(404);
-					return res.json({mensaje: "Producto no encontrado"});
+				if (pr === 0) {
+					res.status(400);
+					return res.json({mensaje: "no se actualizaron datos"});
 				}
-				res.json(pr);
+				res.json({mensaje: "Actualización exitosa"});
 			})
 			.catch(err => {
 				res.status(500);
@@ -230,96 +245,76 @@ router.route('/orders')
 	})
 
 
-	router.route('/orders/:id')
+router.route('/orders/:id')
 
-		.get(function(req, res) {
-			var id = req.params.id;
+	.get(function(req, res) {
+		var id = req.params.id;
 
-			db.order.findByPk(id, { include: [ db.user ] })
-				.then(or => {
-					if (!or) {
-						res.status(400);
-						return res.json("No se encontro pedido");
-					}
-					res.json(or);
-				})
-				.catch(err => {
-					res.status(500);
-					res.json("Hubo un error, intenta de nuevo");
-					console.error("Error buscando orden", err);
-				});
-		})
-
-		.put(function(req, res) {
-			const { status } = req.body;
-			var id = req.params.id;
-			var newRec = {};
-
-			if (status) newRec.status = status;
-
-			db.order.findByPk(id)
-				.then(or => {
-					if (!or) {
-						res.status(404);
-						return res.json({mensaje: "Pedido no encontrado"});
-					}
-					or.update(newRec)
-						.then(result => {
-							if (result === 0) {
-								res.status(400);
-								return res.json({mensaje: "No se actualizó el pedido"});
-							}
-							res.json(or);
-						})
-						.catch(err => {
-							res.status(500);
-							res.json("Hubo un error, intenta de nuevo");
-							console.error("Error al modificar producto", err);
-						});
-				})
-				.catch(err => {
-					res.status(500);
-					res.json("Hubo un error, intenta de nuevo");
-					console.error("Error al modificar producto", err);
-				});
-		})
-
-		.delete(function(req, res) {
-			var id = req.params.id;
-			db.order.destroy({where: {id: id}})
-				.then(del => {
-					if (!or) {
-						res.status(404);
-						return res.json({mensaje: "Pedido no encontrado"});
-					}
-					res.json({mensaje:"Se borro pedido"});
-				})
-				.catch(err => {
-					res.status(500);
-					res.json("Hubo un error, intenta de nuevo");
-					console.error("Error al eliminar pedido", err);
-				});
-		});
-
-
-function resetPass(record, password, id) {
-	bcrypt.hash(password, config.rounds).then(pass => {
-		record.password = pass;
-		db.user.update(record, {where: {id: id}})
-			.then(us => {
-				return us;
+		db.order.findByPk(id, { include: [ db.user ] })
+			.then(or => {
+				if (!or) {
+					res.status(404);
+					return res.json("No se encontro pedido");
+				}
+				res.json(or);
 			})
 			.catch(err => {
 				res.status(500);
 				res.json("Hubo un error, intenta de nuevo");
-				console.error("Error al actualizar usuario", err);
+				console.error("Error buscando orden", err);
 			});
 	})
-	.catch(err => {
-		res.status(500);
-		res.json("Hubo un error, intenta de nuevo");
-		console.error("Error al modificar usuario", err);
+
+	.put(function(req, res) {
+		const { status } = req.body;
+		var id = req.params.id;
+		var newRec = {};
+
+		if (status) newRec.status = status;
+
+		db.order.findByPk(id)
+			.then(or => {
+				if (!or) {
+					res.status(404);
+					return res.json({mensaje: "Pedido no encontrado"});
+				}
+				or.update(newRec)
+					.then(result => {
+						if (result === 0) {
+							res.status(400);
+							return res.json({mensaje: "No se actualizó el pedido"});
+						}
+						res.json(or);
+					})
+					.catch(err => {
+						res.status(500);
+						res.json("Hubo un error, intenta de nuevo");
+						console.error("Error al modificar producto", err);
+					});
+			})
+			.catch(err => {
+				res.status(500);
+				res.json("Hubo un error, intenta de nuevo");
+				console.error("Error al modificar producto", err);
+			});
+	})
+
+	.delete(function(req, res) {
+		var id = req.params.id;
+		db.order.destroy({where: {id: id}})
+			.then(del => {
+				if (!or) {
+					res.status(404);
+					return res.json({mensaje: "Pedido no encontrado"});
+				}
+				res.json({mensaje:"Se borro pedido"});
+			})
+			.catch(err => {
+				res.status(500);
+				res.json("Hubo un error, intenta de nuevo");
+				console.error("Error al eliminar pedido", err);
+			});
 	});
-}
+
 
 module.exports = router;

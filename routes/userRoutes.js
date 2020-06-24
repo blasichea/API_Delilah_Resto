@@ -60,7 +60,7 @@ router.route('/info')
 			db.user.update({password: pass}, {where:{id: req.user.id}})
 				.then(us => {
 					if (us === 0) {
-						res.status(400);
+						res.status(404);
 						return res.json({mensaje: "No se actualizaron datos"});
 					}
 

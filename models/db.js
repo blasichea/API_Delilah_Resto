@@ -1,5 +1,4 @@
 const Sequelize = require('sequelize');
-const create = require('../config/dbCreate');
 const bcrypt = require('bcrypt');
 const config = require('../config/config').bcrypt;
 const {host, port, database, user, pass, dialect} = require('../config/config').db;
@@ -55,21 +54,21 @@ sequelize.sync().then(res => {
 				email: "pedropica@pica.com",
 				tel: "0351155200675",
 				address: "Av. Piedra dura 612",
-				password: "SIN PASSWORD HACER PUT"
+				password: "SIN_PASSWORD_HACER_PUT"
 			},{
 				user: "brunito",
 				name: "Bruno Diaz",
 				email: "batimail@batidomain.com",
 				tel: "0351155456098",
 				address: "Calle Oculta 25",
-				password: "SIN PASSWORD HACER PUT"
+				password: "SIN_PASSWORD_HACER_PUT"
 			},{
 				user: "jose",
 				name: "Jose Rodriguez",
 				email: "joser@mail.com",
 				tel: "0351155781429",
 				address: "Av. Simple 123",
-				password: "SIN PASSWORD HACER PUT"
+				password: "SIN_PASSWORD_HACER_PUT"
 			}
 		])
 			.then(us => {
