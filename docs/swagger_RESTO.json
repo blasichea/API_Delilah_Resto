@@ -1,0 +1,1363 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "REST API for Delilah Resto",
+    "version": "1.0.0",
+    "title": "Delilah Resto"
+  },
+  "tags": [
+    {
+      "name": "sign"
+    },
+    {
+      "name": "admin"
+    },
+    {
+      "name": "users"
+    },
+    {
+      "name": "aboutUsers"
+    },
+    {
+      "name": "aboutProducts"
+    },
+    {
+      "name": "aboutOrders"
+    }
+  ],
+  "paths": {
+    "/login": {
+      "post": {
+        "tags": [
+          "sign"
+        ],
+        "operationId": "getToken",
+        "summary": "Autentication and get token",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "query",
+            "description": "request body",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "type": "string"
+                    },
+                    "password": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    },
+    "/signup": {
+      "post": {
+        "tags": [
+          "sign"
+        ],
+        "operationId": "addUser",
+        "summary": "Register User",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "query",
+            "description": "request body",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "tel": {
+                      "type": "string"
+                    },
+                    "address": {
+                      "type": "string"
+                    },
+                    "password": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    },
+    "/refresh": {
+      "post": {
+        "tags": [
+          "sign"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unautorized"
+          }
+        }
+      }
+    },
+    "/adm/orders": {
+      "get": {
+        "tags": [
+          "admin",
+          "aboutOrders"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ],
+        "operationId": "getOrders",
+        "summary": "Get all available Orders",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Order"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unautorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    },
+    "/adm/orders/{id}": {
+      "get": {
+        "tags": [
+          "admin",
+          "aboutOrders"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ],
+        "operationId": "getOrder",
+        "summary": "Get Order of specific ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of the Order to retrieve",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unautorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "admin",
+          "aboutOrders"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ],
+        "operationId": "modifyOrder",
+        "summary": "Modify Order of specific ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of the Order to modified",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "body",
+            "in": "query",
+            "description": "request body",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "Nuevo",
+                        "Preparando",
+                        "Enviado",
+                        "Entregado",
+                        "Cancelado"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unautorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "admin",
+          "aboutOrders"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ],
+        "operationId": "delOrder",
+        "summary": "Delete Order of specific ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of the Order to deleted",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unautorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    },
+    "/adm/products": {
+      "get": {
+        "tags": [
+          "admin",
+          "aboutProducts"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ],
+        "operationId": "getProducts",
+        "summary": "Get all available Products",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unautorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin",
+          "aboutProducts"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ],
+        "operationId": "addProduct",
+        "summary": "Add new Product",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "query",
+            "description": "request body",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "img": {
+                      "type": "string",
+                      "format": "url"
+                    },
+                    "price": {
+                      "type": "string",
+                      "format": "Numeric"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unautorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    },
+    "/adm/products/{id}": {
+      "get": {
+        "tags": [
+          "admin",
+          "aboutProducts"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ],
+        "operationId": "getProduct",
+        "summary": "Get Product of specific ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of the Product to retrieve",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unautorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "admin",
+          "aboutProducts"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ],
+        "operationId": "modifyProduct",
+        "summary": "Modify Product of specific ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of the Product to modified",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "body",
+            "in": "query",
+            "description": "request body",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "img": {
+                      "type": "string",
+                      "format": "url"
+                    },
+                    "price": {
+                      "type": "string",
+                      "format": "Numeric"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unautorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "admin",
+          "aboutProducts"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ],
+        "operationId": "delProduct",
+        "summary": "Delete Product of specific ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of the Product to deleted",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unautorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    },
+    "/adm/users": {
+      "get": {
+        "tags": [
+          "admin",
+          "aboutUsers"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ],
+        "operationId": "getUsers",
+        "summary": "Get all available Users",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unautorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    },
+    "/adm/users/{id}": {
+      "get": {
+        "tags": [
+          "admin",
+          "aboutUsers"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ],
+        "operationId": "getUser",
+        "summary": "Get User of specific ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of the User to retrieve",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unautorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "admin",
+          "aboutUsers"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ],
+        "operationId": "modifyUser",
+        "summary": "Modify User of specific ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of the User to modified",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "body",
+            "in": "query",
+            "description": "request body",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "tel": {
+                      "type": "string"
+                    },
+                    "address": {
+                      "type": "string"
+                    },
+                    "password": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unautorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "admin",
+          "aboutUsers"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ],
+        "operationId": "delUser",
+        "summary": "Delete User of specific ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of the User to deleted",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unautorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    },
+    "/user/info": {
+      "get": {
+        "tags": [
+          "users",
+          "aboutUsers"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ],
+        "operationId": "getInfoUser",
+        "summary": "Get self info User",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unautorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "users",
+          "aboutUsers"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ],
+        "operationId": "modifyMyUser",
+        "summary": "Modify self User",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "query",
+            "description": "request body",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "password": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unautorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    },
+    "/user/products": {
+      "get": {
+        "tags": [
+          "users",
+          "aboutProducts"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ],
+        "operationId": "getAllProducts",
+        "summary": "Get all available Products",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unautorized"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    },
+    "/user/products/{id}": {
+      "get": {
+        "tags": [
+          "users",
+          "aboutProducts"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ],
+        "operationId": "getOneProduct",
+        "summary": "Get Product of specific ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of the Product to retrieve",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unautorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    },
+    "/user/orders": {
+      "get": {
+        "tags": [
+          "users",
+          "aboutOrders"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ],
+        "operationId": "getAllOrders",
+        "summary": "Get my orders",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Order"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unautorized"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "users",
+          "aboutOrders"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ],
+        "operationId": "addOrder",
+        "summary": "Add new Order",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "query",
+            "description": "request body",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "paying": {
+                      "type": "string",
+                      "enum": [
+                        "Efectivo",
+                        "Tarjeta",
+                        "Virtual",
+                        "Debito"
+                      ]
+                    },
+                    "products": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Product"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Order"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unautorized"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Product": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "uniqueItems": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "img": {
+            "type": "string",
+            "format": "url"
+          },
+          "price": {
+            "type": "string",
+            "format": "Numeric"
+          }
+        },
+        "required": [
+          "name",
+          "img",
+          "price"
+        ]
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "uniqueItems": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "user": {
+            "type": "string",
+            "uniqueItems": true
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "uniqueItems": true
+          },
+          "tel": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "default": "user"
+          },
+          "password": {
+            "type": "string",
+            "format": "password"
+          }
+        },
+        "required": [
+          "name",
+          "user",
+          "email",
+          "tel",
+          "address",
+          "password"
+        ]
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "uniqueItems": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Nuevo",
+              "Preparando",
+              "Enviado",
+              "Entregado",
+              "Cancelado"
+            ],
+            "default": "Nuevo"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "paying": {
+            "type": "string",
+            "enum": [
+              "Efectivo",
+              "Tarjeta",
+              "Virtual",
+              "Debito"
+            ],
+            "default": "Efectivo"
+          },
+          "userId": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "paying",
+          "userId"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "token": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
